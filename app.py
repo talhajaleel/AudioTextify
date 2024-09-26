@@ -9,6 +9,8 @@ from tempfile import NamedTemporaryFile
 app = FastAPI()
 model = whisper.load_model("small", device="cpu") 
 
+
+
 @app.get('/', methods=['GET'])
 async def main():
     try:
