@@ -1,0 +1,41 @@
+name: Deploy AudioTextify to AWS EC2
+
+on:
+  push:
+    branches:
+      - dev # Deploy when changes are pushed to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Decode PEM file from base64
+        run: |
+          echo ${{secrets.PEM2_BASE64}} | base64 -d > ec2-key.pem
+          chmod 400 ec2-key.pem
+
+      - name: SSH into EC2 and Deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }} << 'EOF'
+          cd /home/${{ secrets.EC2_USER }}/AudioTextify
+          pwd
+          source venve/bin/activate
+          # getting updated code from github
+          git pull origin dev
+          # Install dependencies
+          pip install -r requirements.txt
+          pwd
+          # Stop existing FastAPI and Streamlit processes (optional)
+          pkill -f "fastapi dev app.py" || true
+          # Run FastAPI
+          nohup uvicorn app:app --host 0.0.0.0 --port 8000 --reload &
+          EOF
