@@ -28,9 +28,9 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }} << 'EOF'
           cd /home/${{ secrets.EC2_USER }}/AudioTextify
           pwd
-          source venve/bin/activate
+          source venv/bin/activate
           # getting updated code from github
-          git pull origin dev
+          git pull origin main
           # Install dependencies
           pip install -r requirements.txt
           pwd
