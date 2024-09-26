@@ -11,7 +11,7 @@ model = whisper.load_model("small", device="cpu")
 
 
 
-@app.get('/', methods=['GET'])
+@app.get('/')
 async def main():
     try:
         return "HELLO THIS APP IS FUNCTIONAL"
